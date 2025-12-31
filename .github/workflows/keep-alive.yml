@@ -1,0 +1,28 @@
+name: Supabase保活任务
+
+on:
+  schedule:
+    - cron: '0 1,13 * * *'  # 每天UTC时间1点和13点运行（北京时间9点和21点）
+  workflow_dispatch:         # 允许手动触发
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 下载代码
+        uses: actions/checkout@v4
+        
+      - name: 设置Node.js环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: 安装依赖
+        run: npm install
+        
+      - name: 执行保活脚本
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: node scripts/keep-alive.js
